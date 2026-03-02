@@ -13,6 +13,7 @@ import { Orders as AdminOrders } from './pages/admin/Orders'
 import { Products as AdminProducts } from './pages/admin/Products'
 import { Login as AdminLogin } from './pages/admin/Login'
 import { CartSidebar } from './components/CartSidebar'
+import { SplashScreen } from './components/SplashScreen'
 import type { Product } from './types'
 
 interface CartItem extends Product {
@@ -113,9 +114,14 @@ const AppContent: React.FC = () => {
 }
 
 const App: React.FC = () => {
+  const [showSplash, setShowSplash] = useState(true)
+
   return (
     <AuthProvider>
       <Router>
+        {showSplash && !window.location.pathname.startsWith('/admin') && (
+          <SplashScreen onComplete={() => setShowSplash(false)} />
+        )}
         <AppContent />
       </Router>
     </AuthProvider>
