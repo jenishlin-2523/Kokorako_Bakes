@@ -1,5 +1,5 @@
 import React from 'react'
-import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight } from 'lucide-react'
+import { X, Trash2, Plus, Minus, ShoppingBag, ChevronRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import type { Product } from '../types'
@@ -40,117 +40,117 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 bg-bakery-cocoa/40 backdrop-blur-sm z-[100]"
+                        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[100]"
                     />
                     <motion.div
                         initial={{ x: '100%' }}
                         animate={{ x: 0 }}
                         exit={{ x: '100%' }}
-                        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                        className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl z-[101] flex flex-col"
+                        transition={{ type: 'spring', damping: 28, stiffness: 220 }}
+                        className="fixed right-0 top-0 h-full w-full max-w-sm bg-white shadow-2xl z-[101] flex flex-col"
                     >
-                        <div className="p-8 border-b border-bakery-warm flex justify-between items-center bg-bakery-cream/30">
+                        {/* Header */}
+                        <div className="px-6 py-5 flex justify-between items-center border-b border-bakery-warm/50">
                             <div>
-                                <h2 className="text-2xl font-serif font-black text-bakery-cocoa uppercase tracking-tight">Your Collection</h2>
-                                <p className="text-[10px] font-black text-bakery-gold uppercase tracking-widest mt-1">
-                                    {items.length} {items.length === 1 ? 'Masterpiece' : 'Masterpieces'} Reserved
+                                <h2 className="text-lg font-black text-bakery-teal tracking-tight uppercase">Your Basket</h2>
+                                <p className="text-[10px] font-black text-bakery-teal/30 uppercase tracking-widest mt-0.5">
+                                    {items.length} {items.length === 1 ? 'item' : 'items'}
                                 </p>
                             </div>
                             <button
                                 onClick={onClose}
-                                className="p-3 hover:bg-white rounded-full transition-colors text-bakery-cocoa/40 hover:text-bakery-cocoa shadow-sm"
+                                className="w-9 h-9 bg-bakery-cream rounded-xl flex items-center justify-center text-bakery-teal hover:bg-bakery-peach transition-all"
                             >
-                                <X size={20} />
+                                <X size={18} />
                             </button>
                         </div>
 
-                        <div className="flex-grow overflow-y-auto p-8 custom-scrollbar">
+                        {/* Items */}
+                        <div className="flex-grow overflow-y-auto px-6 py-4 space-y-3 custom-scrollbar">
                             {items.length === 0 ? (
-                                <div className="h-full flex flex-col items-center justify-center text-center space-y-6">
-                                    <div className="w-20 h-20 bg-bakery-cream rounded-full flex items-center justify-center text-bakery-gold">
-                                        <ShoppingBag size={32} strokeWidth={1.5} />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-xl font-serif font-bold text-bakery-cocoa">Your collection is empty</h3>
-                                        <p className="text-sm text-bakery-cocoa/40 mt-2">Start adding artisanal cakes to your next celebration.</p>
+                                <div className="h-full flex flex-col items-center justify-center text-center space-y-4 py-16">
+                                    <ShoppingBag size={36} className="text-bakery-teal/20" strokeWidth={1.5} />
+                                    <div className="space-y-1">
+                                        <h3 className="text-sm font-black text-bakery-teal uppercase tracking-wide">Basket is empty</h3>
+                                        <p className="text-xs text-bakery-teal/30 font-medium">Browse treats and add them here.</p>
                                     </div>
                                     <button
                                         onClick={onClose}
-                                        className="bg-bakery-gold text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-bakery-gold/20"
+                                        className="mt-2 bg-bakery-teal text-white px-6 py-2.5 rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-bakery-gold transition-all"
                                     >
-                                        Browse Catalog
+                                        Browse
                                     </button>
                                 </div>
                             ) : (
-                                <div className="space-y-6">
-                                    {items.map((item, idx) => (
-                                        <motion.div
-                                            key={`${item.id}-${item.customization.weight}`}
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: idx * 0.1 }}
-                                            className="flex gap-4 p-4 bg-bakery-cream/20 rounded-3xl border border-bakery-warm"
-                                        >
-                                            <div className="w-24 h-24 rounded-2xl overflow-hidden shadow-sm flex-shrink-0">
+                                items.map((item) => (
+                                    <motion.div
+                                        key={`${item.id}-${item.customization.weight}`}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        className="flex gap-3 p-3 bg-bakery-cream/60 rounded-2xl border border-bakery-warm/40"
+                                    >
+                                        {/* Image */}
+                                        <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-white border border-bakery-warm/40">
+                                            {item.image_url ? (
                                                 <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-bakery-teal/20">
+                                                    <ShoppingBag size={20} />
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Info */}
+                                        <div className="flex-grow min-w-0 space-y-1.5">
+                                            <div className="flex justify-between items-start gap-2">
+                                                <h4 className="font-black text-bakery-teal text-xs tracking-tight line-clamp-1 leading-tight">{item.name}</h4>
+                                                <button
+                                                    onClick={() => onRemoveItem(item.id, item.customization.weight)}
+                                                    className="text-bakery-teal/20 hover:text-red-400 transition-colors flex-shrink-0"
+                                                >
+                                                    <Trash2 size={13} />
+                                                </button>
                                             </div>
-                                            <div className="flex-grow">
-                                                <div className="flex justify-between items-start">
-                                                    <div>
-                                                        <h4 className="font-serif font-bold text-bakery-cocoa">{item.name}</h4>
-                                                        <p className="text-[10px] font-black text-bakery-gold uppercase tracking-widest mt-1">
-                                                            {item.customization.weight}
-                                                        </p>
-                                                    </div>
+                                            <span className="text-[9px] font-black text-bakery-gold uppercase tracking-wide">{item.customization.weight}</span>
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-1 bg-white rounded-lg p-0.5 border border-bakery-warm/40">
                                                     <button
-                                                        onClick={() => onRemoveItem(item.id, item.customization.weight)}
-                                                        className="text-red-300 hover:text-red-500 transition-colors"
+                                                        onClick={() => onUpdateQuantity(item.id, -1, item.customization.weight)}
+                                                        className="w-6 h-6 flex items-center justify-center text-bakery-teal/40 hover:text-bakery-gold transition-colors"
                                                     >
-                                                        <Trash2 size={16} />
+                                                        <Minus size={11} />
+                                                    </button>
+                                                    <span className="text-xs font-black text-bakery-teal w-5 text-center">{item.quantity}</span>
+                                                    <button
+                                                        onClick={() => onUpdateQuantity(item.id, 1, item.customization.weight)}
+                                                        className="w-6 h-6 flex items-center justify-center text-bakery-teal/40 hover:text-bakery-gold transition-colors"
+                                                    >
+                                                        <Plus size={11} />
                                                     </button>
                                                 </div>
-                                                <div className="flex justify-between items-center mt-4">
-                                                    <div className="flex items-center space-x-3 bg-white px-3 py-1.5 rounded-xl border border-bakery-warm shadow-sm">
-                                                        <button
-                                                            onClick={() => onUpdateQuantity(item.id, -1, item.customization.weight)}
-                                                            className="text-bakery-cocoa/40 hover:text-bakery-gold transition-colors"
-                                                        >
-                                                            <Minus size={14} />
-                                                        </button>
-                                                        <span className="text-xs font-black w-6 text-center">{item.quantity}</span>
-                                                        <button
-                                                            onClick={() => onUpdateQuantity(item.id, 1, item.customization.weight)}
-                                                            className="text-bakery-cocoa/40 hover:text-bakery-gold transition-colors"
-                                                        >
-                                                            <Plus size={14} />
-                                                        </button>
-                                                    </div>
-                                                    <p className="font-black text-bakery-cocoa">
-                                                        ₹{(item.prices[item.customization.weight] || 0) * item.quantity}
-                                                    </p>
-                                                </div>
+                                                <p className="font-black text-bakery-gold text-sm tracking-tight">
+                                                    ₹{(item.prices[item.customization.weight] || 0) * item.quantity}
+                                                </p>
                                             </div>
-                                        </motion.div>
-                                    ))}
-                                </div>
+                                        </div>
+                                    </motion.div>
+                                ))
                             )}
                         </div>
 
+                        {/* Footer */}
                         {items.length > 0 && (
-                            <div className="p-8 bg-white border-t border-bakery-warm space-y-6">
+                            <div className="px-6 py-5 border-t border-bakery-warm/50 space-y-4">
                                 <div className="flex justify-between items-center">
-                                    <span className="text-xs font-black text-bakery-cocoa/40 uppercase tracking-widest">Total Investment</span>
-                                    <span className="text-3xl font-serif font-black text-bakery-cocoa">₹{total}</span>
+                                    <span className="text-[10px] font-black text-bakery-teal/30 uppercase tracking-widest">Subtotal</span>
+                                    <p className="text-2xl font-black text-bakery-teal tracking-tight">₹{total}</p>
                                 </div>
-                                <Link to="/checkout" onClick={onClose} className="block">
-                                    <button className="w-full bg-bakery-cocoa hover:bg-bakery-gold text-white py-6 rounded-3xl font-black text-xs uppercase tracking-[0.2em] shadow-2xl transition-all group flex items-center justify-center space-x-3">
-                                        <span>Secure Checkout</span>
-                                        <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                                <Link to="/checkout" onClick={onClose}>
+                                    <button className="w-full bg-bakery-teal hover:bg-bakery-gold text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg transition-all flex items-center justify-center gap-2 group">
+                                        Checkout
+                                        <ChevronRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
                                     </button>
                                 </Link>
-                                <p className="text-[9px] font-black text-bakery-cocoa/20 text-center uppercase tracking-widest">
-                                    Freshness guaranteed • Tax calculated at checkout
-                                </p>
                             </div>
                         )}
                     </motion.div>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link } from 'react-router-dom'
-import { ShoppingBag, MapPin, CreditCard, ChevronLeft, CheckCircle2, MessageCircle } from 'lucide-react'
+import { ShoppingBag, MapPin, CreditCard, ChevronLeft, CheckCircle2, Truck, Clock, ShieldCheck, Phone, Mail, Calendar, User, ChevronRight } from 'lucide-react'
 import { supabase } from '../../services/supabase'
 import { sendWhatsAppOrder } from '../../services/whatsappService'
 
@@ -42,13 +42,10 @@ export const Checkout: React.FC<CheckoutProps> = ({ items, onClearCart }) => {
     const handleSubmit = async () => {
         try {
             setLoading(true)
-
-            // Generate order number KOKO-YYYYMMDD-Random
             const dateStr = new Date().toISOString().split('T')[0].replace(/-/g, '')
             const randomStr = Math.random().toString(36).substring(2, 5).toUpperCase()
-            const orderNumber = `KOKO-${dateStr}-${randomStr}`
+            const orderNumber = `BJKO-${dateStr}-${randomStr}`
 
-            // Save order to Supabase
             const { error: orderError } = await supabase
                 .from('orders')
                 .insert({
@@ -69,66 +66,56 @@ export const Checkout: React.FC<CheckoutProps> = ({ items, onClearCart }) => {
                     }))
                 })
 
-            if (orderError) {
-                console.error('Supabase Order Error:', orderError)
-                throw orderError
-            }
+            if (orderError) throw orderError
 
-            // Send WhatsApp notification
             sendWhatsAppOrder({
-                orderNumber: orderNumber,
+                orderNumber,
                 customerName: formData.name,
                 customerPhone: formData.phone,
                 address: formData.address,
-                items: items,
-                total: total
+                items,
+                total
             })
 
             setOrderComplete(true)
             onClearCart()
         } catch (err) {
-            console.error('Error placing order:', err)
-            alert('Something went wrong while saving your order. Please try again.')
+            console.error(err)
+            alert('Something went wrong. Please try again.')
         } finally {
             setLoading(false)
         }
     }
 
+    const labelClass = "block text-[10px] font-black text-bakery-teal/40 uppercase tracking-widest mb-1.5"
+
     if (items.length === 0 && !orderComplete) {
         return (
-            <div className="min-h-screen bg-bakery-cream flex flex-col items-center justify-center p-4">
-                <div className="p-8 bg-white rounded-[2.5rem] shadow-xl border border-bakery-warm text-center space-y-6">
-                    <div className="w-20 h-20 bg-bakery-cream rounded-full flex items-center justify-center mx-auto">
-                        <ShoppingBag size={40} className="text-bakery-gold/40" />
-                    </div>
-                    <h2 className="text-2xl font-serif font-bold text-bakery-cocoa">Your basket is empty</h2>
-                    <Link to="/catalog">
-                        <button className="bg-bakery-cocoa text-white px-8 py-4 rounded-xl font-bold hover:bg-bakery-gold transition-all shadow-lg uppercase tracking-widest text-xs">
-                            Return to Catalog
-                        </button>
-                    </Link>
-                </div>
+            <div className="min-h-screen bg-bakery-cream flex flex-col items-center justify-center p-6 text-center">
+                <ShoppingBag size={40} className="text-bakery-teal/20 mb-4" strokeWidth={1.5} />
+                <h2 className="text-xl font-black text-bakery-teal mb-2 uppercase tracking-tight">Basket is empty</h2>
+                <p className="text-sm text-bakery-teal/40 mb-6">Add some treats before checking out.</p>
+                <Link to="/catalog">
+                    <button className="bg-bakery-teal text-white px-7 py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-bakery-gold transition-all">
+                        Browse Products
+                    </button>
+                </Link>
             </div>
         )
     }
 
     if (orderComplete) {
         return (
-            <div className="min-h-screen bg-bakery-cream flex flex-col items-center justify-center p-4 text-center">
-                <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="bg-green-100 p-8 rounded-full text-green-600 mb-8 shadow-inner"
-                >
-                    <CheckCircle2 size={64} />
-                </motion.div>
-                <h2 className="text-4xl font-serif font-bold text-bakery-cocoa mb-4">Order Received!</h2>
-                <p className="text-bakery-cocoa/60 max-w-md mb-8 font-medium">
-                    We've received your order and details on WhatsApp.
-                    Our bakers are getting ready! We'll contact you shortly for final confirmation.
+            <div className="min-h-screen bg-bakery-cream flex flex-col items-center justify-center p-6 text-center">
+                <div className="w-16 h-16 bg-bakery-peach rounded-2xl flex items-center justify-center text-bakery-teal mb-6">
+                    <CheckCircle2 size={36} strokeWidth={1.5} />
+                </div>
+                <h2 className="text-2xl font-black text-bakery-teal mb-2 uppercase tracking-tight">Order Placed!</h2>
+                <p className="text-sm text-bakery-teal/50 max-w-xs mx-auto mb-8 leading-relaxed">
+                    Your order has been received. We'll confirm via WhatsApp shortly.
                 </p>
-                <Link to="/catalog">
-                    <button className="bg-bakery-cocoa text-white px-10 py-4 rounded-xl font-bold hover:bg-bakery-gold transition-all shadow-xl uppercase tracking-widest text-xs">
+                <Link to="/">
+                    <button className="bg-bakery-teal text-white px-8 py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-bakery-gold transition-all">
                         Back to Home
                     </button>
                 </Link>
@@ -137,75 +124,75 @@ export const Checkout: React.FC<CheckoutProps> = ({ items, onClearCart }) => {
     }
 
     return (
-        <div className="bg-bakery-cream min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+        <div className="bg-bakery-cream min-h-screen pt-24 pb-16 px-4">
             <div className="max-w-4xl mx-auto">
-                {/* Progress Bar */}
-                <div className="flex items-center justify-between mb-16 relative px-4">
-                    <div className="absolute top-1/2 left-0 w-full h-1 bg-bakery-warm -translate-y-1/2 z-0 rounded-full" />
-                    <div
-                        className="absolute top-1/2 left-0 h-1 bg-bakery-gold -translate-y-1/2 z-10 transition-all duration-700 rounded-full"
-                        style={{ width: `${((step - 1) / 2) * 100}%` }}
-                    />
-                    {[1, 2, 3].map(i => (
-                        <div key={i} className={`relative z-20 w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-500 ${step >= i ? 'bg-bakery-gold text-white scale-110 shadow-xl' : 'bg-white text-bakery-cocoa/20 border-2 border-bakery-warm'
-                            }`}>
-                            {i}
-                        </div>
+
+                {/* Header */}
+                <div className="mb-8">
+                    <h1 className="text-2xl font-black text-bakery-teal tracking-tight">Checkout</h1>
+                    <p className="text-bakery-teal/40 text-sm mt-1">Complete your order in a few steps.</p>
+                </div>
+
+                {/* Step Indicator */}
+                <div className="flex items-center gap-2 mb-8">
+                    {['Contact', 'Delivery', 'Payment'].map((label, idx) => (
+                        <React.Fragment key={idx}>
+                            <div className={`flex items-center gap-2 ${step === idx + 1 ? 'text-bakery-teal' : step > idx + 1 ? 'text-bakery-gold' : 'text-bakery-teal/20'}`}>
+                                <div className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black border transition-all ${step === idx + 1 ? 'bg-bakery-teal text-white border-bakery-teal' : step > idx + 1 ? 'bg-bakery-gold text-white border-bakery-gold' : 'bg-white border-bakery-warm/60 text-bakery-teal/20'}`}>
+                                    {step > idx + 1 ? '✓' : idx + 1}
+                                </div>
+                                <span className="text-[10px] font-black uppercase tracking-widest hidden sm:block">{label}</span>
+                            </div>
+                            {idx < 2 && <div className={`flex-1 h-px ${step > idx + 1 ? 'bg-bakery-gold' : 'bg-bakery-warm/60'}`} />}
+                        </React.Fragment>
                     ))}
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                    {/* Main Form Area */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+
+                    {/* Form */}
                     <div className="lg:col-span-2">
                         <AnimatePresence mode="wait">
                             {step === 1 && (
                                 <motion.div
                                     key="step1"
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -20 }}
-                                    className="bg-white p-10 rounded-[2.5rem] border border-bakery-warm shadow-sm space-y-8"
+                                    initial={{ opacity: 0, x: -12 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 12 }}
+                                    className="bg-white rounded-2xl border border-bakery-warm/40 p-6 space-y-5"
                                 >
-                                    <div className="space-y-2">
-                                        <h2 className="text-3xl font-serif font-bold text-bakery-cocoa flex items-center">
-                                            <MessageCircle className="mr-4 text-bakery-gold" size={28} />
-                                            Contact Info
-                                        </h2>
-                                        <p className="text-xs text-bakery-cocoa/40 font-bold uppercase tracking-widest">Where should we reach you?</p>
+                                    <div className="flex items-center gap-3 pb-4 border-b border-bakery-warm/40">
+                                        <div className="w-8 h-8 bg-bakery-peach rounded-xl flex items-center justify-center text-bakery-teal"><User size={16} /></div>
+                                        <h2 className="font-black text-bakery-teal text-sm uppercase tracking-wide">Contact Details</h2>
                                     </div>
 
-                                    <div className="space-y-6">
-                                        <div className="space-y-2">
-                                            <label className="block text-[10px] font-bold text-bakery-cocoa/40 uppercase tracking-widest ml-1">Full Name</label>
-                                            <input
-                                                type="text"
-                                                name="name"
-                                                required
-                                                value={formData.name}
-                                                onChange={handleInputChange}
-                                                placeholder="Enter your name"
-                                                className="w-full p-4 bg-bakery-cream/50 border border-bakery-warm rounded-2xl focus:ring-2 focus:ring-bakery-gold/20 outline-none transition-all"
-                                            />
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className={labelClass}>Full Name</label>
+                                            <div className="flex items-center gap-2 bg-bakery-cream border border-bakery-warm/60 rounded-xl px-3 py-2.5 focus-within:border-bakery-teal transition-all">
+                                                <User size={14} className="text-bakery-teal/20 flex-shrink-0" />
+                                                <input type="text" name="name" className="w-full bg-transparent text-sm text-bakery-teal placeholder:text-bakery-teal/20 focus:outline-none font-medium" placeholder="Your name" value={formData.name} onChange={handleInputChange} required />
+                                            </div>
                                         </div>
-                                        <div className="space-y-2">
-                                            <label className="block text-[10px] font-bold text-bakery-cocoa/40 uppercase tracking-widest ml-1">WhatsApp Number</label>
-                                            <input
-                                                type="tel"
-                                                name="phone"
-                                                required
-                                                value={formData.phone}
-                                                onChange={handleInputChange}
-                                                placeholder="+91"
-                                                className="w-full p-4 bg-bakery-cream/50 border border-bakery-warm rounded-2xl focus:ring-2 focus:ring-bakery-gold/20 outline-none transition-all"
-                                            />
+                                        <div>
+                                            <label className={labelClass}>Phone</label>
+                                            <div className="flex items-center gap-2 bg-bakery-cream border border-bakery-warm/60 rounded-xl px-3 py-2.5 focus-within:border-bakery-teal transition-all">
+                                                <Phone size={14} className="text-bakery-teal/20 flex-shrink-0" />
+                                                <input type="tel" name="phone" className="w-full bg-transparent text-sm text-bakery-teal placeholder:text-bakery-teal/20 focus:outline-none font-medium" placeholder="+91" value={formData.phone} onChange={handleInputChange} required />
+                                            </div>
                                         </div>
                                     </div>
-                                    <button
-                                        onClick={nextStep}
-                                        disabled={!formData.name || !formData.phone}
-                                        className="w-full bg-bakery-cocoa text-white py-5 rounded-2xl font-bold hover:bg-bakery-gold transition-all shadow-xl disabled:bg-gray-100 disabled:text-gray-300 uppercase tracking-widest text-xs"
-                                    >
-                                        Continue to Delivery
+
+                                    <div>
+                                        <label className={labelClass}>Email</label>
+                                        <div className="flex items-center gap-2 bg-bakery-cream border border-bakery-warm/60 rounded-xl px-3 py-2.5 focus-within:border-bakery-teal transition-all">
+                                            <Mail size={14} className="text-bakery-teal/20 flex-shrink-0" />
+                                            <input type="email" name="email" className="w-full bg-transparent text-sm text-bakery-teal placeholder:text-bakery-teal/20 focus:outline-none font-medium" placeholder="you@email.com" value={formData.email} onChange={handleInputChange} required />
+                                        </div>
+                                    </div>
+
+                                    <button onClick={nextStep} disabled={!formData.name || !formData.phone || !formData.email} className="w-full bg-bakery-teal text-white py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-bakery-gold transition-all disabled:opacity-30 flex items-center justify-center gap-2 mt-2">
+                                        Continue <ChevronRight size={14} />
                                     </button>
                                 </motion.div>
                             )}
@@ -213,52 +200,37 @@ export const Checkout: React.FC<CheckoutProps> = ({ items, onClearCart }) => {
                             {step === 2 && (
                                 <motion.div
                                     key="step2"
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -20 }}
-                                    className="bg-white p-10 rounded-[2.5rem] border border-bakery-warm shadow-sm space-y-8"
+                                    initial={{ opacity: 0, x: -12 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 12 }}
+                                    className="bg-white rounded-2xl border border-bakery-warm/40 p-6 space-y-5"
                                 >
-                                    <div className="space-y-2">
-                                        <h2 className="text-3xl font-serif font-bold text-bakery-cocoa flex items-center">
-                                            <MapPin className="mr-4 text-bakery-gold" size={28} />
-                                            Delivery Place
-                                        </h2>
-                                        <p className="text-xs text-bakery-cocoa/40 font-bold uppercase tracking-widest">Tell us where to bring the goodness</p>
+                                    <div className="flex items-center gap-3 pb-4 border-b border-bakery-warm/40">
+                                        <div className="w-8 h-8 bg-bakery-peach rounded-xl flex items-center justify-center text-bakery-teal"><Truck size={16} /></div>
+                                        <h2 className="font-black text-bakery-teal text-sm uppercase tracking-wide">Delivery Details</h2>
                                     </div>
 
-                                    <div className="space-y-6">
-                                        <div className="space-y-2">
-                                            <label className="block text-[10px] font-bold text-bakery-cocoa/40 uppercase tracking-widest ml-1">Full Address</label>
-                                            <textarea
-                                                name="address"
-                                                required
-                                                value={formData.address}
-                                                onChange={handleInputChange}
-                                                rows={3}
-                                                placeholder="Street, Landmark, City..."
-                                                className="w-full p-4 bg-bakery-cream/50 border border-bakery-warm rounded-2xl focus:ring-2 focus:ring-bakery-gold/20 outline-none transition-all resize-none"
-                                            />
+                                    <div>
+                                        <label className={labelClass}>Delivery Address</label>
+                                        <div className="flex items-start gap-2 bg-bakery-cream border border-bakery-warm/60 rounded-xl px-3 py-2.5 focus-within:border-bakery-teal transition-all">
+                                            <MapPin size={14} className="text-bakery-teal/20 flex-shrink-0 mt-0.5" />
+                                            <textarea name="address" rows={3} className="w-full bg-transparent text-sm text-bakery-teal placeholder:text-bakery-teal/20 focus:outline-none font-medium resize-none" placeholder="Full address" value={formData.address} onChange={handleInputChange} required />
                                         </div>
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="space-y-2">
-                                                <label className="block text-[10px] font-bold text-bakery-cocoa/40 uppercase tracking-widest ml-1">Delivery Date</label>
-                                                <input
-                                                    type="date"
-                                                    name="deliveryDate"
-                                                    required
-                                                    value={formData.deliveryDate}
-                                                    onChange={handleInputChange}
-                                                    className="w-full p-4 bg-bakery-cream/50 border border-bakery-warm rounded-2xl focus:ring-2 focus:ring-bakery-gold/20 outline-none"
-                                                />
+                                    </div>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className={labelClass}>Preferred Date</label>
+                                            <div className="flex items-center gap-2 bg-bakery-cream border border-bakery-warm/60 rounded-xl px-3 py-2.5 focus-within:border-bakery-teal transition-all">
+                                                <Calendar size={14} className="text-bakery-teal/20 flex-shrink-0" />
+                                                <input type="date" name="deliveryDate" className="w-full bg-transparent text-sm text-bakery-teal focus:outline-none font-medium" value={formData.deliveryDate} onChange={handleInputChange} required />
                                             </div>
-                                            <div className="space-y-2">
-                                                <label className="block text-[10px] font-bold text-bakery-cocoa/40 uppercase tracking-widest ml-1">Preferred Time</label>
-                                                <select
-                                                    name="deliveryTime"
-                                                    value={formData.deliveryTime}
-                                                    onChange={handleInputChange}
-                                                    className="w-full p-4 bg-bakery-cream/50 border border-bakery-warm rounded-2xl focus:ring-2 focus:ring-bakery-gold/20 outline-none font-medium"
-                                                >
+                                        </div>
+                                        <div>
+                                            <label className={labelClass}>Time Slot</label>
+                                            <div className="flex items-center gap-2 bg-bakery-cream border border-bakery-warm/60 rounded-xl px-3 py-2.5 focus-within:border-bakery-teal transition-all">
+                                                <Clock size={14} className="text-bakery-teal/20 flex-shrink-0" />
+                                                <select name="deliveryTime" className="w-full bg-transparent text-sm text-bakery-teal focus:outline-none font-medium appearance-none cursor-pointer" value={formData.deliveryTime} onChange={handleInputChange}>
                                                     <option>10:00 AM - 01:00 PM</option>
                                                     <option>01:00 PM - 04:00 PM</option>
                                                     <option>04:00 PM - 07:00 PM</option>
@@ -267,19 +239,13 @@ export const Checkout: React.FC<CheckoutProps> = ({ items, onClearCart }) => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="flex space-x-4">
-                                        <button
-                                            onClick={prevStep}
-                                            className="p-5 bg-bakery-cream border border-bakery-warm rounded-2xl hover:bg-white transition-all"
-                                        >
-                                            <ChevronLeft size={20} />
+
+                                    <div className="flex gap-3 mt-2">
+                                        <button onClick={prevStep} className="px-4 py-3 bg-bakery-cream rounded-xl text-bakery-teal font-black text-xs uppercase tracking-widest hover:bg-bakery-peach transition-all flex items-center gap-1">
+                                            <ChevronLeft size={14} />
                                         </button>
-                                        <button
-                                            onClick={nextStep}
-                                            disabled={!formData.address || !formData.deliveryDate}
-                                            className="flex-grow bg-bakery-cocoa text-white py-5 rounded-2xl font-bold hover:bg-bakery-gold transition-all shadow-xl disabled:bg-gray-100 disabled:text-gray-300 uppercase tracking-widest text-xs"
-                                        >
-                                            Review My Order
+                                        <button onClick={nextStep} disabled={!formData.address || !formData.deliveryDate} className="flex-1 bg-bakery-teal text-white py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-bakery-gold transition-all disabled:opacity-30 flex items-center justify-center gap-2">
+                                            Continue <ChevronRight size={14} />
                                         </button>
                                     </div>
                                 </motion.div>
@@ -288,98 +254,90 @@ export const Checkout: React.FC<CheckoutProps> = ({ items, onClearCart }) => {
                             {step === 3 && (
                                 <motion.div
                                     key="step3"
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -20 }}
-                                    className="bg-white p-10 rounded-[2.5rem] border border-bakery-warm shadow-sm space-y-8"
+                                    initial={{ opacity: 0, x: -12 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 12 }}
+                                    className="bg-white rounded-2xl border border-bakery-warm/40 p-6 space-y-5"
                                 >
-                                    <div className="space-y-2">
-                                        <h2 className="text-3xl font-serif font-bold text-bakery-cocoa flex items-center">
-                                            <CreditCard className="mr-4 text-bakery-gold" size={28} />
-                                            Order Summary
-                                        </h2>
-                                        <p className="text-xs text-bakery-cocoa/40 font-bold uppercase tracking-widest">Double check your details</p>
+                                    <div className="flex items-center gap-3 pb-4 border-b border-bakery-warm/40">
+                                        <div className="w-8 h-8 bg-bakery-peach rounded-xl flex items-center justify-center text-bakery-teal"><CreditCard size={16} /></div>
+                                        <h2 className="font-black text-bakery-teal text-sm uppercase tracking-wide">Payment</h2>
                                     </div>
 
-                                    <div className="space-y-4">
-                                        <div className="bg-bakery-cream/50 p-6 rounded-[1.5rem] border border-bakery-warm space-y-3">
-                                            <div className="flex justify-between items-start">
-                                                <div>
-                                                    <p className="text-[10px] font-bold text-bakery-cocoa/30 uppercase tracking-widest">Ship To</p>
-                                                    <p className="font-bold text-bakery-cocoa">{formData.name}</p>
-                                                    <p className="text-sm text-bakery-cocoa/70">{formData.address}</p>
-                                                </div>
-                                                <button onClick={() => setStep(2)} className="text-[10px] font-bold text-bakery-gold uppercase underline">Edit</button>
-                                            </div>
-                                            <div className="pt-3 border-t border-bakery-warm/50 flex justify-between">
-                                                <div>
-                                                    <p className="text-[10px] font-bold text-bakery-cocoa/30 uppercase tracking-widest">Phone</p>
-                                                    <p className="text-sm font-bold text-bakery-cocoa">{formData.phone}</p>
-                                                </div>
-                                                <div className="text-right">
-                                                    <p className="text-[10px] font-bold text-bakery-cocoa/30 uppercase tracking-widest">Delivery</p>
-                                                    <p className="text-sm font-bold text-bakery-cocoa">{formData.deliveryDate}</p>
-                                                </div>
-                                            </div>
+                                    <div className="p-4 rounded-xl border-2 border-bakery-teal/20 bg-bakery-teal/5 flex items-center gap-4">
+                                        <div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center text-bakery-gold border border-bakery-warm/60">
+                                            <CheckCircle2 size={18} />
+                                        </div>
+                                        <div>
+                                            <p className="font-black text-bakery-teal text-sm">Cash on Delivery</p>
+                                            <p className="text-xs text-bakery-teal/40">Pay when you receive your order.</p>
                                         </div>
                                     </div>
 
-                                    <div className="pt-4">
-                                        <button
-                                            onClick={handleSubmit}
-                                            disabled={loading}
-                                            className="w-full bg-green-600 text-white py-6 rounded-2xl font-bold hover:bg-green-700 transition-all shadow-xl flex items-center justify-center space-x-4 disabled:bg-gray-100 disabled:text-gray-300"
-                                        >
-                                            {loading ? (
-                                                <div className="h-6 w-6 border-3 border-white/30 border-t-white rounded-full animate-spin" />
-                                            ) : (
-                                                <>
-                                                    <MessageCircle size={24} />
-                                                    <span className="uppercase tracking-[0.2em] text-sm">Send Order via WhatsApp</span>
-                                                </>
-                                            )}
+                                    <div className="flex gap-3 pt-1 text-center">
+                                        {[
+                                            { icon: ShieldCheck, label: "Secure" },
+                                            { icon: Truck, label: "Tracked" },
+                                            { icon: Clock, label: "On Time" }
+                                        ].map(({ icon: Icon, label }, idx) => (
+                                            <div key={idx} className="flex-1 bg-bakery-cream rounded-xl py-3 border border-bakery-warm/40 flex flex-col items-center gap-1.5">
+                                                <Icon size={15} className="text-bakery-teal/30" />
+                                                <p className="text-[9px] font-black text-bakery-teal/40 uppercase tracking-wide">{label}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <div className="flex gap-3 mt-2">
+                                        <button onClick={prevStep} className="px-4 py-3 bg-bakery-cream rounded-xl text-bakery-teal font-black text-xs hover:bg-bakery-peach transition-all flex items-center">
+                                            <ChevronLeft size={14} />
                                         </button>
-                                        <p className="text-center text-[10px] text-bakery-cocoa/40 font-bold uppercase tracking-widest mt-6 italic">Secure order transmission via WhatsApp Business</p>
+                                        <button onClick={handleSubmit} disabled={loading} className="flex-1 bg-bakery-teal text-white py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-bakery-gold transition-all disabled:opacity-30">
+                                            {loading ? 'Placing...' : 'Place Order'}
+                                        </button>
                                     </div>
                                 </motion.div>
                             )}
                         </AnimatePresence>
                     </div>
 
-                    {/* Sidebar Summary */}
-                    <div className="lg:col-span-1">
-                        <div className="bg-white p-8 rounded-[2.5rem] border border-bakery-warm shadow-sm sticky top-32 space-y-6">
-                            <h3 className="font-serif font-bold text-xl text-bakery-cocoa border-b border-bakery-cream pb-4">Your Selection</h3>
-                            <div className="space-y-6 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
-                                {items.map((item, idx) => {
-                                    const price = item.prices ? item.prices[item.customization?.weight] || 0 : 0
-                                    return (
-                                        <div key={`${item.id}-${idx}`} className="flex justify-between items-start group">
-                                            <div className="flex-grow pr-4">
-                                                <p className="font-bold text-bakery-cocoa text-sm line-clamp-1 group-hover:text-bakery-gold transition-colors">{item.name}</p>
-                                                <p className="text-[10px] text-bakery-cocoa/40 font-bold uppercase tracking-widest mt-1">
-                                                    {item.customization?.weight || 'Standard'} • Qty {item.quantity}
-                                                </p>
-                                            </div>
-                                            <span className="font-bold text-bakery-cocoa text-sm">₹{price * item.quantity}</span>
+                    {/* Order Summary */}
+                    <div className="space-y-4">
+                        <div className="bg-white rounded-2xl border border-bakery-warm/40 p-5 space-y-4">
+                            <h3 className="font-black text-bakery-teal text-xs uppercase tracking-widest flex items-center gap-2">
+                                <ShoppingBag size={14} />
+                                Order Summary
+                            </h3>
+
+                            <div className="space-y-2.5 max-h-52 overflow-y-auto custom-scrollbar">
+                                {items.map((item, idx) => (
+                                    <div key={idx} className="flex justify-between items-start gap-3">
+                                        <div>
+                                            <p className="text-xs font-black text-bakery-teal line-clamp-1">{item.name}</p>
+                                            <p className="text-[9px] text-bakery-teal/30 font-medium">{item.quantity}× {item.customization?.weight}</p>
                                         </div>
-                                    )
-                                })}
+                                        <p className="text-xs font-black text-bakery-gold shrink-0">₹{(item.prices[item.customization?.weight] || 0) * item.quantity}</p>
+                                    </div>
+                                ))}
                             </div>
-                            <div className="pt-6 border-t border-bakery-warm space-y-3">
-                                <div className="flex justify-between text-xs font-bold text-bakery-cocoa/40 uppercase tracking-widest">
-                                    <span>Subtotal</span>
-                                    <span>₹{subtotal}</span>
+
+                            <div className="pt-3 border-t border-bakery-warm/40 space-y-1.5">
+                                <div className="flex justify-between text-[10px] font-semibold text-bakery-teal/40">
+                                    <span>Subtotal</span><span>₹{subtotal}</span>
                                 </div>
-                                <div className="flex justify-between text-xs font-bold text-bakery-cocoa/40 uppercase tracking-widest">
-                                    <span>Delivery</span>
-                                    <span>₹{deliveryCharge}</span>
+                                <div className="flex justify-between text-[10px] font-semibold text-bakery-teal/40">
+                                    <span>Delivery</span><span>₹{deliveryCharge}</span>
                                 </div>
-                                <div className="flex justify-between pt-4 border-t border-bakery-cream">
-                                    <span className="text-lg font-serif font-bold text-bakery-cocoa">Total</span>
-                                    <span className="text-2xl font-bold text-bakery-gold">₹{total}</span>
+                                <div className="flex justify-between items-center pt-2">
+                                    <span className="text-xs font-black text-bakery-teal uppercase tracking-wide">Total</span>
+                                    <span className="text-xl font-black text-bakery-gold">₹{total}</span>
                                 </div>
                             </div>
+                        </div>
+
+                        <div className="bg-bakery-peach/40 rounded-2xl p-4 border border-bakery-warm/40">
+                            <p className="text-xs text-bakery-teal/60 leading-relaxed">
+                                You'll receive a WhatsApp confirmation after placing your order.
+                            </p>
                         </div>
                     </div>
                 </div>

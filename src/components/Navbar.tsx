@@ -1,6 +1,7 @@
-import React from 'react'
-import { ShoppingCart, User, Menu, Search, X } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import { ShoppingBag, Menu, X } from 'lucide-react'
+import { Link, useLocation } from 'react-router-dom'
+import { AnimatePresence, motion } from 'framer-motion'
 
 interface NavbarProps {
     onOpenCart: () => void
@@ -8,64 +9,106 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, cartCount }) => {
-    const [isMenuOpen, setIsMenuOpen] = React.useState(false)
+    const [scrolled, setScrolled] = useState(false)
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+    const location = useLocation()
+
+    useEffect(() => {
+        const handleScroll = () => setScrolled(window.scrollY > 20)
+        window.addEventListener('scroll', handleScroll)
+        return () => window.removeEventListener('scroll', handleScroll)
+    }, [])
+
+    const navLinks = [
+        { name: 'Home', path: '/' },
+        { name: 'Products', path: '/catalog' },
+    ]
 
     return (
-        <nav className="bg-bakery-cream border-b border-bakery-warm sticky top-0 z-50">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between h-20 items-center">
-                    <div className="flex items-center">
-                        <button
-                            className="sm:hidden p-2 text-bakery-cocoa"
-                            onClick={() => setIsMenuOpen(!isMenuOpen)}
+        <nav className="fixed top-0 left-0 right-0 z-50 px-4 py-3">
+            <div className={`max-w-5xl mx-auto flex items-center justify-between bg-white/80 backdrop-blur-md border border-bakery-warm/60 px-5 py-3 rounded-2xl shadow-sm transition-all duration-300 ${scrolled ? 'shadow-md' : ''}`}>
+
+                {/* Logo */}
+                <Link to="/" className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-bakery-teal rounded-xl flex items-center justify-center text-white">
+                        <span className="font-black text-sm">K</span>
+                    </div>
+                    <span className="text-base font-black text-bakery-teal tracking-tight">
+                        KOKORAKO <span className="text-bakery-gold">BAKES</span>
+                    </span>
+                </Link>
+
+                {/* Desktop Links */}
+                <div className="hidden md:flex items-center gap-8">
+                    {navLinks.map(link => (
+                        <Link
+                            key={link.name}
+                            to={link.path}
+                            className={`text-xs font-black uppercase tracking-widest transition-colors ${location.pathname === link.path ? 'text-bakery-gold' : 'text-bakery-teal/50 hover:text-bakery-teal'}`}
                         >
-                            {isMenuOpen ? <X /> : <Menu />}
+                            {link.name}
+                        </Link>
+                    ))}
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center gap-3">
+                    <Link to="/catalog" className="hidden sm:block">
+                        <button className="px-5 py-2 bg-bakery-teal text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-bakery-gold transition-all">
+                            Order Now
                         </button>
-                        <Link to="/" className="flex items-center space-x-2">
-                            <span className="text-2xl font-serif font-bold text-bakery-cocoa tracking-tight">
-                                KOKORAKO <span className="text-bakery-gold">BAKES</span>
+                    </Link>
+
+                    <button
+                        onClick={onOpenCart}
+                        className="relative p-2 text-bakery-teal hover:text-bakery-gold transition-colors"
+                    >
+                        <ShoppingBag size={20} strokeWidth={2} />
+                        {cartCount > 0 && (
+                            <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-bakery-gold text-white text-[8px] font-black rounded-full flex items-center justify-center">
+                                {cartCount}
                             </span>
-                        </Link>
-                    </div>
+                        )}
+                    </button>
 
-                    <div className="hidden sm:flex items-center space-x-8">
-                        <Link to="/" className="text-bakery-cocoa hover:text-bakery-gold transition-colors font-medium">HOME</Link>
-                        <Link to="/catalog" className="text-bakery-cocoa hover:text-bakery-gold transition-colors font-medium">CATALOG</Link>
-                        <Link to="/about" className="text-bakery-cocoa hover:text-bakery-gold transition-colors font-medium">OUR STORY</Link>
-                        <Link to="/contact" className="text-bakery-cocoa hover:text-bakery-gold transition-colors font-medium">CONTACT</Link>
-                    </div>
-
-                    <div className="flex items-center space-x-5">
-                        <button className="p-2 text-bakery-cocoa hover:text-bakery-gold transition-colors">
-                            <Search size={22} />
-                        </button>
-                        <Link to="/account" className="p-2 text-bakery-cocoa hover:text-bakery-gold transition-colors">
-                            <User size={22} />
-                        </Link>
-                        <button
-                            onClick={onOpenCart}
-                            className="p-2 text-bakery-cocoa hover:text-bakery-gold transition-colors relative"
-                        >
-                            <ShoppingCart size={22} />
-                            {cartCount > 0 && (
-                                <span className="absolute top-0 right-0 h-4 w-4 bg-bakery-gold text-white text-[10px] flex items-center justify-center rounded-full font-bold">
-                                    {cartCount}
-                                </span>
-                            )}
-                        </button>
-                    </div>
+                    <button
+                        className="md:hidden p-2 text-bakery-teal"
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                    >
+                        {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+                    </button>
                 </div>
             </div>
 
             {/* Mobile Menu */}
-            {isMenuOpen && (
-                <div className="sm:hidden bg-bakery-warm border-t border-bakery-warm px-4 py-6 space-y-4">
-                    <Link to="/" className="block text-bakery-cocoa font-medium">HOME</Link>
-                    <Link to="/catalog" className="block text-bakery-cocoa font-medium">CATALOG</Link>
-                    <Link to="/about" className="block text-bakery-cocoa font-medium">OUR STORY</Link>
-                    <Link to="/contact" className="block text-bakery-cocoa font-medium">CONTACT</Link>
-                </div>
-            )}
+            <AnimatePresence>
+                {isMobileMenuOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        className="mt-2 max-w-5xl mx-auto bg-white/95 backdrop-blur-md rounded-2xl border border-bakery-warm/60 shadow-lg p-5 md:hidden"
+                    >
+                        <div className="flex flex-col gap-4">
+                            {navLinks.map(link => (
+                                <Link
+                                    key={link.name}
+                                    to={link.path}
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="text-sm font-black text-bakery-teal hover:text-bakery-gold transition-colors uppercase tracking-widest"
+                                >
+                                    {link.name}
+                                </Link>
+                            ))}
+                            <Link to="/catalog" onClick={() => setIsMobileMenuOpen(false)}>
+                                <button className="w-full py-3 bg-bakery-teal text-white rounded-xl font-black text-xs uppercase tracking-widest">
+                                    Order Now
+                                </button>
+                            </Link>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </nav>
     )
 }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ShoppingCart, ArrowLeft, Star, Clock, ShieldCheck, Truck } from 'lucide-react'
+import { ShoppingBag, Clock, ShieldCheck, Truck, ChevronLeft, Minus, Plus } from 'lucide-react'
 import { supabase } from '../../services/supabase'
 import type { Product } from '../../types'
 
@@ -16,6 +16,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart }) => 
     const [loading, setLoading] = useState(true)
     const [selectedWeight, setSelectedWeight] = useState<string>('')
     const [quantity, setQuantity] = useState(1)
+    const [added, setAdded] = useState(false)
 
     useEffect(() => {
         if (id) fetchProduct()
@@ -24,45 +25,34 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart }) => 
     const fetchProduct = async () => {
         try {
             setLoading(true)
-            const { data, error } = await supabase
-                .from('cakes')
-                .select('*')
-                .eq('id', id)
-                .single()
-
+            const { data, error } = await supabase.from('cakes').select('*').eq('id', id).single()
             if (error) throw error
             setProduct(data)
-
-            // Set default weight if prices exist
             if (data?.prices) {
                 const weights = Object.keys(data.prices)
                 if (weights.length > 0) setSelectedWeight(weights[0])
             }
-        } catch (err) {
-            console.error('Error fetching product:', err)
-        } finally {
-            setLoading(false)
-        }
+        } catch (err) { console.error(err) } finally { setLoading(false) }
     }
 
     if (loading) {
         return (
             <div className="min-h-screen bg-bakery-cream flex items-center justify-center">
-                <div className="h-12 w-12 border-4 border-bakery-gold border-t-transparent rounded-full animate-spin" />
+                <div className="w-10 h-10 border-4 border-bakery-teal border-t-transparent rounded-full animate-spin" />
             </div>
         )
     }
 
     if (!product) {
         return (
-            <div className="min-h-screen bg-bakery-cream flex flex-col items-center justify-center p-6 text-center">
-                <h2 className="text-2xl font-serif font-bold text-bakery-cocoa mb-4">Treat Not Found</h2>
+            <div className="min-h-screen bg-bakery-cream flex flex-col items-center justify-center gap-4 text-center">
+                <ShoppingBag size={32} className="text-bakery-teal/30" />
+                <p className="font-black text-bakery-teal text-sm uppercase tracking-widest">Product not found</p>
                 <button
                     onClick={() => navigate('/catalog')}
-                    className="text-bakery-gold font-bold flex items-center space-x-2"
+                    className="text-bakery-teal/40 font-black text-xs uppercase tracking-widest hover:text-bakery-teal transition-colors flex items-center gap-1"
                 >
-                    <ArrowLeft size={20} />
-                    <span>Back to Catalog</span>
+                    <ChevronLeft size={14} /> Back to Catalog
                 </button>
             </div>
         )
@@ -70,141 +60,155 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart }) => 
 
     const price = product.prices ? product.prices[selectedWeight] || 0 : 0
 
+    const handleAddToCart = () => {
+        onAddToCart(product, { weight: selectedWeight }, quantity)
+        setAdded(true)
+        setTimeout(() => setAdded(false), 2000)
+    }
+
     return (
-        <div className="bg-bakery-cream min-h-screen py-20 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-7xl mx-auto">
+        <div className="bg-bakery-cream min-h-screen pt-28 pb-16 px-4">
+            <div className="max-w-4xl mx-auto">
+
+                {/* Back */}
                 <button
                     onClick={() => navigate(-1)}
-                    className="mb-12 flex items-center space-x-2 text-bakery-cocoa/40 hover:text-bakery-gold transition-colors font-bold text-xs uppercase tracking-widest"
+                    className="flex items-center gap-1.5 text-bakery-teal/40 font-black text-[10px] uppercase tracking-widest hover:text-bakery-teal transition-colors mb-8 group"
                 >
-                    <ArrowLeft size={18} />
-                    <span>Back to Bakery</span>
+                    <ChevronLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" />
+                    Back
                 </button>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-                    {/* Product Image */}
-                    <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="relative"
-                    >
-                        <div className="aspect-square rounded-[3rem] overflow-hidden border border-bakery-warm shadow-2xl">
-                            <img
-                                src={product.image_url}
-                                alt={product.name}
-                                className="w-full h-full object-cover"
-                            />
-                        </div>
-                        <div className="absolute -bottom-6 -right-6 bg-white p-8 rounded-[2rem] shadow-xl border border-bakery-warm hidden md:block">
-                            <div className="flex items-center space-x-4">
-                                <div className="p-3 bg-bakery-gold/10 text-bakery-gold rounded-xl">
-                                    <Star size={24} fill="currentColor" />
-                                </div>
-                                <div>
-                                    <p className="text-xl font-bold text-bakery-cocoa">Top Rated</p>
-                                    <p className="text-[10px] font-bold text-bakery-cocoa/40 uppercase tracking-widest leading-none">Customer Favorite</p>
-                                </div>
-                            </div>
-                        </div>
-                    </motion.div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
 
-                    {/* Product Info */}
-                    <motion.div
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="space-y-10"
-                    >
-                        <div>
-                            <span className="bg-bakery-gold/10 text-bakery-gold text-[10px] font-black px-4 py-2 rounded-full uppercase tracking-widest mb-4 inline-block">
-                                {product.category}
-                            </span>
-                            <h1 className="text-4xl md:text-5xl font-serif font-black text-bakery-cocoa mb-4 uppercase tracking-tight leading-tight">{product.name}</h1>
-                            <p className="text-lg text-bakery-cocoa/60 leading-relaxed max-w-xl">{product.description}</p>
-                        </div>
-
-                        {/* Customization */}
-                        <div className="space-y-6">
-                            {product.dietary_tags && product.dietary_tags.length > 0 && (
-                                <div className="flex flex-wrap gap-2 mb-6">
-                                    {product.dietary_tags.map(tag => (
-                                        <span key={tag} className="bg-green-50 text-green-600 text-[8px] font-black px-3 py-1 rounded-full uppercase tracking-tighter border border-green-100">
-                                            {tag}
-                                        </span>
-                                    ))}
+                    {/* Image */}
+                    <div className="bg-white rounded-3xl overflow-hidden shadow-md border border-bakery-warm/40">
+                        <div className="aspect-square">
+                            {product.image_url ? (
+                                <img
+                                    src={product.image_url}
+                                    alt={product.name}
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-bakery-cream text-bakery-teal/20">
+                                    <ShoppingBag size={64} strokeWidth={1} />
                                 </div>
                             )}
+                        </div>
+                    </div>
 
-                            <div>
-                                <h3 className="text-[10px] font-black text-bakery-cocoa/30 uppercase tracking-[0.2em] mb-4">Select Weight</h3>
-                                <div className="flex flex-wrap gap-3">
-                                    {product.prices && Object.keys(product.prices).map(weight => (
-                                        <button
-                                            key={weight}
-                                            onClick={() => setSelectedWeight(weight)}
-                                            className={`px-8 py-4 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all ${selectedWeight === weight
-                                                ? 'bg-bakery-cocoa text-white shadow-xl shadow-bakery-cocoa/20 scale-105'
-                                                : 'bg-white border border-bakery-warm text-bakery-cocoa hover:border-bakery-gold/40'
-                                                }`}
-                                        >
-                                            {weight}
-                                        </button>
-                                    ))}
+                    {/* Details */}
+                    <div className="space-y-6">
+                        {/* Category + Tags */}
+                        <div className="flex flex-wrap gap-2">
+                            <span className="text-[9px] font-black text-bakery-teal uppercase tracking-widest px-3 py-1 bg-bakery-teal/10 rounded-full">
+                                {product.category}
+                            </span>
+                            {product.dietary_tags?.map(tag => (
+                                <span key={tag} className="text-[9px] font-black text-bakery-gold uppercase tracking-widest px-3 py-1 bg-bakery-gold/10 rounded-full">
+                                    {tag}
+                                </span>
+                            ))}
+                        </div>
+
+                        {/* Name & Description */}
+                        <div className="space-y-2">
+                            <h1 className="text-3xl font-black text-bakery-teal tracking-tight leading-tight font-display">
+                                {product.name}
+                            </h1>
+                            <p className="text-bakery-teal/50 text-sm leading-relaxed">
+                                {product.description}
+                            </p>
+                        </div>
+
+                        {/* Size selector */}
+                        {product.prices && (
+                            <div className="space-y-3">
+                                <label className="text-[9px] font-black text-bakery-teal/30 uppercase tracking-[0.3em]">
+                                    Choose Size
+                                </label>
+                                <div className="flex flex-wrap gap-2">
+                                    {Object.keys(product.prices)
+                                        .sort((a, b) => {
+                                            const getWeightInGrams = (str: string) => {
+                                                const value = parseFloat(str);
+                                                if (isNaN(value)) return 0;
+                                                return str.toLowerCase().includes('kg') ? value * 1000 : value;
+                                            };
+                                            return getWeightInGrams(a) - getWeightInGrams(b);
+                                        })
+                                        .map(weight => (
+                                            <button
+                                                key={weight}
+                                                type="button"
+                                                onClick={() => setSelectedWeight(weight)}
+                                                className={`px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-wide transition-all ${selectedWeight === weight
+                                                        ? 'bg-bakery-teal text-white shadow-md -translate-y-0.5'
+                                                        : 'bg-white text-bakery-teal border border-bakery-warm/60 hover:border-bakery-teal/30'
+                                                    }`}
+                                            >
+                                                {weight}
+                                            </button>
+                                        ))
+                                    }
                                 </div>
                             </div>
+                        )}
 
-                            <div className="flex items-center space-x-8 pt-4">
-                                <div>
-                                    <h3 className="text-[10px] font-black text-bakery-cocoa/30 uppercase tracking-[0.2em] mb-4 text-left">Quantity</h3>
-                                    <div className="flex items-center space-x-4 bg-white p-2 rounded-2xl border border-bakery-warm">
-                                        <button
-                                            onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                            className="h-10 w-10 flex items-center justify-center hover:bg-bakery-cream rounded-xl text-xl font-black text-bakery-cocoa"
-                                        >
-                                            -
-                                        </button>
-                                        <span className="w-12 text-center font-black text-bakery-cocoa">{quantity}</span>
-                                        <button
-                                            onClick={() => setQuantity(quantity + 1)}
-                                            className="h-10 w-10 flex items-center justify-center hover:bg-bakery-cream rounded-xl text-xl font-black text-bakery-cocoa"
-                                        >
-                                            +
-                                        </button>
-                                    </div>
+                        {/* Quantity & Price */}
+                        <div className="flex items-center justify-between py-4 border-t border-b border-bakery-warm/40">
+                            <div className="space-y-1">
+                                <label className="text-[9px] font-black text-bakery-teal/30 uppercase tracking-[0.3em]">Quantity</label>
+                                <div className="flex items-center gap-1 bg-white rounded-xl border border-bakery-warm/60 p-1">
+                                    <button
+                                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                        className="w-8 h-8 flex items-center justify-center text-bakery-teal hover:text-bakery-gold transition-colors"
+                                    >
+                                        <Minus size={14} />
+                                    </button>
+                                    <span className="w-8 text-center font-black text-bakery-teal text-sm">{quantity}</span>
+                                    <button
+                                        onClick={() => setQuantity(quantity + 1)}
+                                        className="w-8 h-8 flex items-center justify-center text-bakery-teal hover:text-bakery-gold transition-colors"
+                                    >
+                                        <Plus size={14} />
+                                    </button>
                                 </div>
-                                <div className="flex-grow">
-                                    <h3 className="text-[10px] font-black text-bakery-cocoa/40 uppercase tracking-[0.2em] mb-4 text-right">Investment</h3>
-                                    <p className="text-5xl font-serif font-black text-bakery-cocoa text-right leading-none">
-                                        ₹{price * quantity}
-                                    </p>
-                                </div>
+                            </div>
+                            <div className="text-right">
+                                <label className="text-[9px] font-black text-bakery-teal/30 uppercase tracking-[0.3em]">Total</label>
+                                <p className="text-3xl font-black text-bakery-gold tracking-tighter">₹{price * quantity}</p>
                             </div>
                         </div>
 
                         {/* Add to Cart */}
-                        <button
-                            onClick={() => onAddToCart(product, { weight: selectedWeight }, quantity)}
-                            className="w-full flex items-center justify-center space-x-4 bg-bakery-gold hover:bg-bakery-cocoa text-white py-6 rounded-[2rem] font-black text-sm uppercase tracking-[0.2em] transition-all shadow-2xl shadow-bakery-gold/20 group"
+                        <motion.button
+                            whileTap={{ scale: 0.97 }}
+                            onClick={handleAddToCart}
+                            className={`w-full py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-md transition-all flex items-center justify-center gap-2 ${added
+                                ? 'bg-green-500 text-white'
+                                : 'bg-bakery-teal text-white hover:bg-bakery-gold'
+                                }`}
                         >
-                            <ShoppingCart size={20} className="group-hover:scale-110 transition-transform" />
-                            <span>Add to Collection</span>
-                        </button>
+                            <ShoppingBag size={16} />
+                            {added ? 'Added to Basket!' : 'Add to Basket'}
+                        </motion.button>
 
-                        {/* Trust Badges */}
-                        <div className="grid grid-cols-3 gap-6 pt-10 border-t border-bakery-warm">
-                            <div className="text-center space-y-2">
-                                <div className="mx-auto w-10 h-10 flex items-center justify-center text-bakery-gold"><Clock size={20} /></div>
-                                <p className="text-[8px] font-black text-bakery-cocoa/40 uppercase tracking-widest">Fresh Baked</p>
-                            </div>
-                            <div className="text-center space-y-2">
-                                <div className="mx-auto w-10 h-10 flex items-center justify-center text-bakery-gold"><Truck size={20} /></div>
-                                <p className="text-[8px] font-black text-bakery-cocoa/40 uppercase tracking-widest">Madurai Delivery</p>
-                            </div>
-                            <div className="text-center space-y-2">
-                                <div className="mx-auto w-10 h-10 flex items-center justify-center text-bakery-gold"><ShieldCheck size={20} /></div>
-                                <p className="text-[8px] font-black text-bakery-cocoa/40 uppercase tracking-widest">Quality Assured</p>
-                            </div>
+                        {/* Badges */}
+                        <div className="grid grid-cols-3 gap-3">
+                            {[
+                                { icon: Clock, label: "Fresh Daily" },
+                                { icon: Truck, label: "Local Delivery" },
+                                { icon: ShieldCheck, label: "Pure Quality" }
+                            ].map((item, idx) => (
+                                <div key={idx} className="bg-white rounded-2xl p-3 border border-bakery-warm/40 flex flex-col items-center gap-2 text-center">
+                                    <item.icon size={16} className="text-bakery-teal/40" />
+                                    <p className="text-[8px] font-black text-bakery-teal/40 uppercase tracking-wide leading-none">{item.label}</p>
+                                </div>
+                            ))}
                         </div>
-                    </motion.div>
+                    </div>
                 </div>
             </div>
         </div>

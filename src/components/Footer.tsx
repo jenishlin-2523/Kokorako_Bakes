@@ -1,63 +1,78 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Facebook, Instagram, Twitter, MapPin, Phone, Mail } from 'lucide-react'
+import { Phone, MessageCircle, Instagram } from 'lucide-react'
 
 export const Footer: React.FC = () => {
     return (
-        <footer className="bg-bakery-cocoa text-bakery-cream pt-16 pb-8">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-12">
-                <div className="space-y-4">
-                    <h3 className="text-xl font-serif font-bold">KOKORAKO BAKES</h3>
-                    <p className="text-bakery-cream/70 text-sm leading-relaxed">
-                        Crafting artisanal moments of joy in Madurai. From classic brownies to bespoke wedding cakes, we bake with love and local flavors.
-                    </p>
-                    <div className="flex space-x-4 pt-2">
-                        <Facebook size={20} className="hover:text-bakery-gold cursor-pointer transition-colors" />
-                        <Instagram size={20} className="hover:text-bakery-gold cursor-pointer transition-colors" />
-                        <Twitter size={20} className="hover:text-bakery-gold cursor-pointer transition-colors" />
+        <footer className="bg-bakery-teal text-white font-sans">
+            <div className="max-w-5xl mx-auto px-6 py-14">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+
+                    {/* Brand */}
+                    <div className="space-y-4">
+                        <Link to="/" className="flex items-center gap-2">
+                            <div className="w-8 h-8 bg-bakery-gold rounded-xl flex items-center justify-center text-white">
+                                <span className="font-black text-sm">K</span>
+                            </div>
+                            <span className="text-base font-black tracking-tight">
+                                KOKORAKO <span className="text-bakery-gold">BAKES</span>
+                            </span>
+                        </Link>
+                        <p className="text-white/50 text-sm leading-relaxed">
+                            Handcrafted brownies, cakes & pastries — made fresh for every occasion.
+                        </p>
+                        <div className="flex gap-3">
+                            {[Instagram].map((Icon, idx) => (
+                                <a key={idx} href="#" className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-white/50 hover:bg-bakery-gold hover:text-white transition-all">
+                                    <Icon size={15} />
+                                </a>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Links */}
+                    <div className="space-y-4">
+                        <h4 className="text-[10px] font-black text-bakery-gold uppercase tracking-[0.3em]">Quick Links</h4>
+                        <ul className="space-y-3">
+                            {[
+                                { label: 'Home', path: '/' },
+                                { label: 'Products', path: '/catalog' },
+                            ].map(item => (
+                                <li key={item.label}>
+                                    <Link to={item.path} className="text-xs font-semibold text-white/50 hover:text-white transition-colors uppercase tracking-wider">
+                                        {item.label}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Contact */}
+                    <div className="space-y-4">
+                        <h4 className="text-[10px] font-black text-bakery-gold uppercase tracking-[0.3em]">Contact</h4>
+                        <div className="space-y-3">
+                            <div className="flex items-center gap-3 text-white/60">
+                                <Phone size={14} className="text-bakery-gold flex-shrink-0" />
+                                <span className="text-xs font-semibold">+91 97876 85159</span>
+                            </div>
+                            <a
+                                href="https://wa.me/917418932321?text=Hi%20Kokorako%20Bakes!%20I%27d%20like%20to%20place%20an%20order."
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-3 text-white/60 hover:text-green-400 transition-colors group"
+                            >
+                                <MessageCircle size={14} className="text-bakery-gold group-hover:text-green-400 flex-shrink-0 transition-colors" />
+                                <span className="text-xs font-semibold">+91 74189 32321</span>
+                                <span className="text-[9px] font-black text-green-500/60 uppercase tracking-widest">WhatsApp</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
-                <div>
-                    <h4 className="font-bold mb-6 tracking-wide">QUICK LINKS</h4>
-                    <ul className="space-y-3 text-sm text-bakery-cream/70">
-                        <li><Link to="/catalog" className="hover:text-bakery-gold">Browse Catalog</Link></li>
-                        <li><Link to="/custom-orders" className="hover:text-bakery-gold">Custom Cakes</Link></li>
-                        <li><Link to="/delivery" className="hover:text-bakery-gold">Delivery Areas</Link></li>
-                        <li><Link to="/faq" className="hover:text-bakery-gold">FAQs</Link></li>
-                    </ul>
+                <div className="mt-12 pt-6 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-2">
+                    <p className="text-[10px] text-white/20 uppercase tracking-widest">© {new Date().getFullYear()} Kokorako Bakes. All rights reserved.</p>
+                    <p className="text-[10px] text-white/20 uppercase tracking-widest">Made with ♥ for sweet lovers</p>
                 </div>
-
-                <div>
-                    <h4 className="font-bold mb-6 tracking-wide">CONTACT US</h4>
-                    <ul className="space-y-3 text-sm text-bakery-cream/70">
-                        <li className="flex items-center space-x-3 text-bakery-cream/70">
-                            <MapPin size={16} /> <span>Anna Nagar, Madurai, TN</span>
-                        </li>
-                        <li className="flex items-center space-x-3 text-bakery-cream/70">
-                            <Phone size={16} /> <span>+91 98765 43210</span>
-                        </li>
-                        <li className="flex items-center space-x-3 text-bakery-cream/70">
-                            <Mail size={16} /> <span>hello@kokorakobakes.com</span>
-                        </li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h4 className="font-bold mb-6 tracking-wide">NEWSLETTER</h4>
-                    <p className="text-sm text-bakery-cream/70 mb-4">Get sweet treats and deals in your inbox.</p>
-                    <div className="flex">
-                        <input
-                            type="email"
-                            placeholder="Your email"
-                            className="bg-bakery-cream/10 border border-bakery-cream/20 px-4 py-2 w-full text-sm focus:outline-none focus:border-bakery-gold rounded-l"
-                        />
-                        <button className="bg-bakery-gold text-white px-4 py-2 text-sm font-bold rounded-r">JOIN</button>
-                    </div>
-                </div>
-            </div>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 pt-8 border-t border-bakery-cream/10 text-center text-xs text-bakery-cream/40">
-                © {new Date().getFullYear()} Kokorako Bakes. All rights reserved.
             </div>
         </footer>
     )
