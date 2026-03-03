@@ -100,16 +100,10 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart }) => 
 
                     {/* Details */}
                     <div className="space-y-6">
-                        {/* Category + Tags */}
                         <div className="flex flex-wrap gap-2">
                             <span className="text-[9px] font-black text-bakery-teal uppercase tracking-widest px-3 py-1 bg-bakery-teal/10 rounded-full">
                                 {product.category}
                             </span>
-                            {product.dietary_tags?.map(tag => (
-                                <span key={tag} className="text-[9px] font-black text-bakery-gold uppercase tracking-widest px-3 py-1 bg-bakery-gold/10 rounded-full">
-                                    {tag}
-                                </span>
-                            ))}
                         </div>
 
                         {/* Name & Description */}
@@ -144,8 +138,8 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart }) => 
                                                 type="button"
                                                 onClick={() => setSelectedWeight(weight)}
                                                 className={`px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-wide transition-all ${selectedWeight === weight
-                                                        ? 'bg-bakery-teal text-white shadow-md -translate-y-0.5'
-                                                        : 'bg-white text-bakery-teal border border-bakery-warm/60 hover:border-bakery-teal/30'
+                                                    ? 'bg-bakery-teal text-white shadow-md -translate-y-0.5'
+                                                    : 'bg-white text-bakery-teal border border-bakery-warm/60 hover:border-bakery-teal/30'
                                                     }`}
                                             >
                                                 {weight}

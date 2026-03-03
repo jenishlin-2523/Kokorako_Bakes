@@ -5,7 +5,6 @@ export interface Product {
     prices: Record<string, number>
     image_url: string
     category: string
-    dietary_tags: string[]
     created_at?: string
 }
 

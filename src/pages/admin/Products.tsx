@@ -10,7 +10,6 @@ interface Product {
     image_url: string
     category: string
     prices: Record<string, number>
-    dietary_tags: string[]
 }
 
 export const Products: React.FC = () => {
@@ -34,7 +33,6 @@ export const Products: React.FC = () => {
             '2kg': 0
         },
         image_url: '',
-        dietary_tags: [] as string[]
     })
 
     const weights = ['250g', '500g', '1kg', '1.5kg', '2kg']
@@ -83,8 +81,9 @@ export const Products: React.FC = () => {
 
             if (error) throw error
             setProducts(data || [])
-        } catch (err) {
+        } catch (err: any) {
             console.error('Error fetching products:', err)
+            alert(err.message || 'Error fetching products')
         } finally {
             setLoading(false)
         }
@@ -107,8 +106,9 @@ export const Products: React.FC = () => {
             }
             setShowModal(false)
             fetchProducts()
-        } catch (err) {
+        } catch (err: any) {
             console.error('Error saving product:', err)
+            alert(err.message || 'Error saving product')
         }
     }
 
@@ -127,8 +127,8 @@ export const Products: React.FC = () => {
     }
 
     const filteredProducts = products.filter(p => {
-        const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            p.description.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesSearch = (p.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+            (p.description?.toLowerCase() || '').includes(searchTerm.toLowerCase());
         const matchesCategory = filterCategory === 'All' || p.category === filterCategory;
         return matchesSearch && matchesCategory;
     })
@@ -165,7 +165,6 @@ export const Products: React.FC = () => {
                                 category: 'Cakes',
                                 prices: { '250g': 0, '500g': 0, '1kg': 0, '1.5kg': 0, '2kg': 0 },
                                 image_url: '',
-                                dietary_tags: []
                             })
                             setShowModal(true)
                         }}
@@ -242,7 +241,6 @@ export const Products: React.FC = () => {
                                                     '2kg': product.prices?.['2kg'] || 0
                                                 },
                                                 image_url: product.image_url,
-                                                dietary_tags: product.dietary_tags || []
                                             })
                                             setShowModal(true)
                                         }}
@@ -270,13 +268,7 @@ export const Products: React.FC = () => {
                                 <p className="text-slate-500 text-xs line-clamp-2 mb-6">
                                     {product.description}
                                 </p>
-                                <div className="flex flex-wrap gap-2 mb-6">
-                                    {product.dietary_tags?.map(tag => (
-                                        <span key={tag} className="px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-bold rounded-md uppercase tracking-tight border border-slate-200">
-                                            {tag}
-                                        </span>
-                                    ))}
-                                </div>
+
                                 <div className="bg-slate-50/50 rounded-xl p-4 border border-slate-100">
                                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Starting Prices</p>
                                     <div className="flex items-center justify-between">
@@ -302,7 +294,6 @@ export const Products: React.FC = () => {
                                     <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Product</th>
                                     <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Category</th>
                                     <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Pricing (500g)</th>
-                                    <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Tags</th>
                                     <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
                                 </tr>
                             </thead>
@@ -328,16 +319,7 @@ export const Products: React.FC = () => {
                                         <td className="px-6 py-4 font-bold text-slate-900 text-sm">
                                             ₹{product.prices?.['500g'] || '0'}
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex gap-1">
-                                                {product.dietary_tags?.slice(0, 2).map(tag => (
-                                                    <span key={tag} className="text-[10px] text-brand-600 font-bold px-1.5 py-0.5 bg-brand-50 rounded border border-brand-100 uppercase">
-                                                        {tag}
-                                                    </span>
-                                                ))}
-                                                {product.dietary_tags?.length > 2 && <span className="text-[10px] text-slate-400">+{product.dietary_tags.length - 2}</span>}
-                                            </div>
-                                        </td>
+
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex items-center justify-end gap-2">
                                                 <button
@@ -355,7 +337,6 @@ export const Products: React.FC = () => {
                                                                 '2kg': product.prices?.['2kg'] || 0
                                                             },
                                                             image_url: product.image_url,
-                                                            dietary_tags: product.dietary_tags || []
                                                         })
                                                         setShowModal(true)
                                                     }}
@@ -504,24 +485,22 @@ export const Products: React.FC = () => {
                                         </div>
                                     </div>
                                 </div>
+                                <div className="mt-8 px-0 py-6 border-t border-slate-100 flex items-center justify-end gap-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowModal(false)}
+                                        className="px-6 py-2.5 rounded-xl font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-200 transition-all text-sm uppercase tracking-wide"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="px-8 py-2.5 rounded-xl font-bold text-white bg-slate-900 hover:bg-black transition-all shadow-xl shadow-slate-900/20 text-sm uppercase tracking-wide"
+                                    >
+                                        {editingProduct ? 'Save Changes' : 'Initialize SKU'}
+                                    </button>
+                                </div>
                             </form>
-
-                            <div className="px-8 py-6 border-t border-slate-100 flex items-center justify-end gap-4 bg-slate-50/50">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowModal(false)}
-                                    className="px-6 py-2.5 rounded-xl font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-200 transition-all text-sm uppercase tracking-wide"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    form="product-form"
-                                    className="px-8 py-2.5 rounded-xl font-bold text-white bg-slate-900 hover:bg-black transition-all shadow-xl shadow-slate-900/20 text-sm uppercase tracking-wide"
-                                >
-                                    {editingProduct ? 'Save Changes' : 'Initialize SKU'}
-                                </button>
-                            </div>
                         </motion.div>
                     </div>
                 )}

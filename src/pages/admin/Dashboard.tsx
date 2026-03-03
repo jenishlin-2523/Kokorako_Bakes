@@ -10,6 +10,7 @@ import {
     AlertCircle
 } from 'lucide-react'
 import { supabase } from '../../services/supabase'
+import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 
 export const Dashboard: React.FC = () => {
@@ -163,7 +164,14 @@ export const Dashboard: React.FC = () => {
                         </div>
                         <div className="mt-8">
                             <p className="text-slate-400 text-[10px] font-bold uppercase tracking-[0.15em] mb-1.5">{stat.label}</p>
-                            <h3 className="text-2xl font-bold text-slate-900 tracking-tight">{stat.value}</h3>
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-2xl font-bold text-slate-900 tracking-tight">{stat.value}</h3>
+                                {stat.label === 'SKUs in stock' && (
+                                    <Link to="/admin/products" className="text-brand-600 hover:text-brand-700 p-1 hover:bg-brand-50 rounded-lg transition-all">
+                                        <ArrowUpRight size={16} />
+                                    </Link>
+                                )}
+                            </div>
                         </div>
                     </motion.div>
                 ))}
