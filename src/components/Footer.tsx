@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Phone, MessageCircle, Instagram } from 'lucide-react'
+import { MessageCircle, Instagram } from 'lucide-react'
 
 export const Footer: React.FC = () => {
     return (
