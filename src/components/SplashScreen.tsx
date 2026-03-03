@@ -43,7 +43,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
     }
 
     return (
-        <div className="fixed inset-0 z-[9999] overflow-hidden pointer-events-none times-font">
+        <div className="fixed inset-0 z-[9999] overflow-hidden pointer-events-none">
             {/* ─── LEFT CURTAIN PANEL ─── */}
             <motion.div
                 initial={{ x: 0 }}
@@ -128,11 +128,11 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
                                 Artisanal Bakes
                             </span>
 
-                            <h1 className="text-6xl md:text-8xl font-black text-bakery-teal tracking-tighter">
-                                KOKORAKO
+                            <h1 className="text-7xl md:text-9xl font-hanoble text-bakery-teal tracking-tighter">
+                                Kokorako
                             </h1>
-                            <h2 className="text-3xl md:text-5xl font-bold text-bakery-gold tracking-[0.4em] -mt-2">
-                                BAKES
+                            <h2 className="text-4xl md:text-6xl font-hanoble text-bakery-gold tracking-[0.4em] -mt-4 opacity-80">
+                                Bakes
                             </h2>
 
                             <div className="w-16 h-px bg-bakery-teal/10 mt-12" />
@@ -147,13 +147,6 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
 
             {/* Vignette depth */}
             <div className="absolute inset-0 pointer-events-none z-[105] bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.03)_100%)]" />
-
-            <style dangerouslySetInnerHTML={{
-                __html: `
-                .times-font {
-                    font-family: 'Times New Roman', Times, serif;
-                }
-            `}} />
         </div>
     )
 }

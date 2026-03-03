@@ -16,8 +16,9 @@ export default {
                 }
             },
             fontFamily: {
-                sans: ['Inter', 'system-ui', 'sans-serif'],
+                sans: ['Outfit', 'Inter', 'system-ui', 'sans-serif'],
                 serif: ['Lora', 'Georgia', 'serif'],
+                hanoble: ['Hanoble', 'sans-serif'],
             }
         },
     },
