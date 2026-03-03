@@ -51,10 +51,6 @@ export const Footer: React.FC = () => {
                     <div className="space-y-4">
                         <h4 className="text-[10px] font-black text-bakery-gold uppercase tracking-[0.3em]">Contact</h4>
                         <div className="space-y-3">
-                            <div className="flex items-center gap-3 text-white/60">
-                                <Phone size={14} className="text-bakery-gold flex-shrink-0" />
-                                <span className="text-xs font-semibold">+91 97876 85159</span>
-                            </div>
                             <a
                                 href="https://wa.me/917418932321?text=Hi%20Kokorako%20Bakes!%20I%27d%20like%20to%20place%20an%20order."
                                 target="_blank"
