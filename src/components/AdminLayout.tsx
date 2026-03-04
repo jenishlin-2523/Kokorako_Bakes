@@ -1,22 +1,23 @@
 import React, { useState } from 'react'
 import { Navigate, Outlet, Link, useLocation } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
     LayoutDashboard,
     ShoppingCart,
     Cake,
     LogOut,
-    Menu,
     ChevronRight,
     Settings,
-    HelpCircle
+    History
 } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
+import { AdminHeader } from './AdminHeader'
 
 export const AdminLayout: React.FC = () => {
     const { user, loading, signOut } = useAuth()
     const location = useLocation()
     const [isSidebarOpen, setSidebarOpen] = useState(true)
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
     if (loading) {
         return (
@@ -33,152 +34,153 @@ export const AdminLayout: React.FC = () => {
     const navItems = [
         { path: '/admin', label: 'Dashboard', icon: LayoutDashboard },
         { path: '/admin/orders', label: 'Orders', icon: ShoppingCart },
+        { path: '/admin/history', label: 'History', icon: History },
         { path: '/admin/products', label: 'Inventory', icon: Cake },
     ]
 
     const secondaryItems = [
         { path: '/admin/settings', label: 'Settings', icon: Settings },
-        { path: '/admin/help', label: 'Support', icon: HelpCircle },
     ]
 
-    return (
-        <div className="min-h-screen bg-[#F8FAF9] flex font-sans">
-            {/* SaaS Sidebar */}
-            <aside className={`
-                ${isSidebarOpen ? 'w-72' : 'w-20'} 
-                bg-sidebar-bg transition-all duration-300 ease-in-out
-                hidden lg:flex flex-col relative z-30 shadow-2xl
-            `}>
-                {/* Brand Section */}
-                <div className="h-20 flex items-center px-6 mb-4">
-                    <Link to="/admin" className="flex items-center space-x-3 overflow-hidden">
-                        <div className="h-10 w-10 min-w-[2.5rem] bg-brand-500 rounded-xl flex items-center justify-center shadow-lg shadow-brand-500/20">
-                            <span className="text-white font-black text-xl">K</span>
+    const SidebarContent = ({ isCollapsed, onLinkClick }: { isCollapsed: boolean, onLinkClick?: () => void }) => (
+        <div className="flex flex-col h-full">
+            {/* Brand Section */}
+            <div className="h-20 flex items-center px-6 mb-4 flex-shrink-0">
+                <Link to="/admin" className="flex items-center space-x-3 overflow-hidden" onClick={onLinkClick}>
+                    <div className="h-10 w-10 min-w-[2.5rem] bg-brand-500 rounded-xl flex items-center justify-center shadow-lg shadow-brand-500/20">
+                        <span className="text-white font-black text-xl">K</span>
+                    </div>
+                    {!isCollapsed && (
+                        <div className="flex flex-col">
+                            <span className="text-white font-bold tracking-tight text-lg leading-tight">Kokorako</span>
+                            <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Enterprise</span>
                         </div>
-                        {isSidebarOpen && (
-                            <motion.div
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                className="flex flex-col"
-                            >
-                                <span className="text-white font-bold tracking-tight text-lg leading-tight">Kokorako</span>
-                                <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Enterprise</span>
-                            </motion.div>
-                        )}
-                    </Link>
+                    )}
+                </Link>
+            </div>
+
+            {/* Main Navigation */}
+            <nav className="flex-grow px-4 space-y-1 overflow-y-auto custom-scrollbar">
+                <div className={`${!isCollapsed ? 'px-4 mb-2' : 'text-center mb-4'}`}>
+                    <span className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.2em]">Menu</span>
                 </div>
-
-                {/* Main Navigation */}
-                <nav className="flex-grow px-4 space-y-1">
-                    <div className={`${isSidebarOpen ? 'px-4 mb-2' : 'text-center mb-4'}`}>
-                        <span className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.2em]">Menu</span>
-                    </div>
-                    {navItems.map((item) => {
-                        const isActive = location.pathname === item.path
-                        return (
-                            <Link key={item.path} to={item.path}>
-                                <div className={`
-                                    sidebar-item mb-1
-                                    ${isActive ? 'sidebar-item-active' : 'sidebar-item-inactive'}
-                                    ${!isSidebarOpen && 'justify-center px-0'}
-                                `}>
-                                    <item.icon size={20} className={isActive ? 'text-white' : 'text-slate-400'} />
-                                    {isSidebarOpen && (
-                                        <motion.span
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            className="ml-4"
-                                        >
-                                            {item.label}
-                                        </motion.span>
-                                    )}
-                                    {isActive && isSidebarOpen && (
-                                        <motion.div layoutId="activePill" className="ml-auto">
-                                            <ChevronRight size={14} className="opacity-50" />
-                                        </motion.div>
-                                    )}
-                                </div>
-                            </Link>
-                        )
-                    })}
-
-                    <div className={`${isSidebarOpen ? 'px-4 mt-8 mb-2' : 'text-center mt-8 mb-4'}`}>
-                        <span className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.2em]">System</span>
-                    </div>
-                    {secondaryItems.map((item) => (
-                        <div key={item.label} className={`sidebar-item sidebar-item-inactive mb-1 cursor-pointer ${!isSidebarOpen && 'justify-center px-0'}`}>
-                            <item.icon size={20} />
-                            {isSidebarOpen && <span className="ml-4">{item.label}</span>}
-                        </div>
-                    ))}
-                </nav>
-
-                {/* User Section */}
-                <div className="p-4 mt-auto border-t border-slate-800/50">
-                    <div className={`
-                        flex items-center p-2 rounded-xl bg-slate-800/30
-                        ${!isSidebarOpen ? 'justify-center p-1' : 'justify-between'}
-                    `}>
-                        <div className="flex items-center space-x-3 overflow-hidden">
-                            <div className="h-9 w-9 min-w-[2.25rem] rounded-lg bg-gradient-to-tr from-brand-600 to-brand-400 flex items-center justify-center text-white font-bold text-sm">
-                                {user.email?.[0].toUpperCase()}
+                {navItems.map((item) => {
+                    const isActive = location.pathname === item.path
+                    return (
+                        <Link key={item.path} to={item.path} onClick={onLinkClick}>
+                            <div className={`
+                                sidebar-item mb-1
+                                ${isActive ? 'sidebar-item-active' : 'sidebar-item-inactive'}
+                                ${isCollapsed && 'justify-center px-0'}
+                            `}>
+                                <item.icon size={20} className={isActive ? 'text-white' : 'text-slate-400'} />
+                                {!isCollapsed && (
+                                    <motion.span
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        className="ml-4"
+                                    >
+                                        {item.label}
+                                    </motion.span>
+                                )}
+                                {isActive && !isCollapsed && (
+                                    <div className="ml-auto">
+                                        <ChevronRight size={14} className="opacity-50" />
+                                    </div>
+                                )}
                             </div>
-                            {isSidebarOpen && (
-                                <div className="min-w-0">
-                                    <p className="text-xs font-bold text-white truncate">{user.email?.split('@')[0]}</p>
-                                    <p className="text-[10px] text-slate-500 font-medium">Administrator</p>
-                                </div>
-                            )}
-                        </div>
-                        {isSidebarOpen && (
-                            <button
-                                onClick={() => signOut()}
-                                className="p-1.5 hover:bg-slate-700/50 rounded-lg text-slate-400 hover:text-white transition-colors"
-                            >
-                                <LogOut size={16} />
-                            </button>
-                        )}
-                    </div>
+                        </Link>
+                    )
+                })}
+
+                <div className={`mt-10 ${!isCollapsed ? 'px-4 mb-2' : 'text-center mb-4'}`}>
+                    <span className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.2em]">System</span>
                 </div>
-            </aside>
+                {secondaryItems.map((item) => {
+                    const isActive = location.pathname === item.path
+                    return (
+                        <Link key={item.path} to={item.path} onClick={onLinkClick}>
+                            <div className={`
+                                sidebar-item mb-1
+                                ${isActive ? 'sidebar-item-active' : 'sidebar-item-inactive'}
+                                ${isCollapsed && 'justify-center px-0'}
+                            `}>
+                                <item.icon size={20} className={isActive ? 'text-white' : 'text-slate-400'} />
+                                {!isCollapsed && <span className="ml-4">{item.label}</span>}
+                            </div>
+                        </Link>
+                    )
+                })}
+            </nav>
+
+            {/* User Profile / Logout */}
+            <div className="p-4 mt-auto border-t border-white/5 flex-shrink-0">
+                <button
+                    onClick={() => signOut()}
+                    className={`
+                        w-full flex items-center p-3 rounded-xl
+                        text-slate-400 hover:text-white hover:bg-white/5 transition-all
+                        ${isCollapsed ? 'justify-center' : 'space-x-3'}
+                    `}
+                >
+                    <LogOut size={20} />
+                    {!isCollapsed && <span className="text-sm font-semibold">Sign Out</span>}
+                </button>
+            </div>
+        </div>
+    )
+
+    return (
+        <div className="flex h-screen bg-sidebar-bg font-sans overflow-hidden">
+            {/* Desktop Sidebar */}
+            <motion.aside
+                initial={false}
+                animate={{ width: isSidebarOpen ? 280 : 88 }}
+                className="hidden lg:flex flex-col border-r border-white/5 bg-sidebar-bg flex-shrink-0 relative z-40 transition-all duration-300 ease-in-out"
+            >
+                <SidebarContent isCollapsed={!isSidebarOpen} />
+            </motion.aside>
+
+            {/* Mobile Sidebar (Drawer) */}
+            <AnimatePresence>
+                {isMobileMenuOpen && (
+                    <>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] lg:hidden"
+                        />
+                        <motion.aside
+                            initial={{ x: '-100%' }}
+                            animate={{ x: 0 }}
+                            exit={{ x: '-100%' }}
+                            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                            className="fixed top-0 left-0 bottom-0 w-[280px] bg-sidebar-bg z-[101] lg:hidden shadow-2xl"
+                        >
+                            <SidebarContent isCollapsed={false} onLinkClick={() => setIsMobileMenuOpen(false)} />
+                        </motion.aside>
+                    </>
+                )}
+            </AnimatePresence>
 
             {/* Main Content Area */}
-            <main className="flex-grow flex flex-col h-screen overflow-hidden">
-                {/* SaaS Header */}
-                <header className="h-20 glass sticky top-0 z-20 flex items-center justify-between px-8 border-b border-slate-200/50">
-                    <div className="flex items-center space-x-4">
-                        <button
-                            onClick={() => setSidebarOpen(!isSidebarOpen)}
-                            className="p-2 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors"
-                        >
-                            <Menu size={20} />
-                        </button>
+            <div className="flex-grow flex flex-col h-screen overflow-hidden w-full bg-[#F8FAFC]">
+                {/* Scrollable Content Container */}
+                <div className="flex-grow overflow-y-auto overflow-x-hidden custom-scrollbar">
+                    <AdminHeader
+                        user={user}
+                        isSidebarOpen={isSidebarOpen}
+                        setSidebarOpen={setSidebarOpen}
+                        setIsMobileMenuOpen={setIsMobileMenuOpen}
+                    />
 
-                    </div>
-
-                    <div className="flex items-center space-x-4">
-                        <div className="h-8 w-px bg-slate-200 mx-2" />
-                        <div className="flex items-center space-x-3">
-                            <div className="text-right hidden sm:block">
-                                <p className="text-sm font-bold text-slate-800">{user.email?.split('@')[0]}</p>
-                                <p className="text-[10px] text-brand-600 font-bold uppercase tracking-wider">Premium Plan</p>
-                            </div>
-                            <div className="h-10 w-10 bg-slate-100 rounded-full border border-slate-200 flex items-center justify-center p-1">
-                                <div className="h-full w-full bg-slate-200 rounded-full flex items-center justify-center overflow-hidden">
-                                    <span className="text-slate-600 font-bold text-xs">{user.email?.[0].toUpperCase()}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </header>
-
-                {/* Scrollable Content */}
-                <div className="flex-grow overflow-y-auto p-8 custom-scrollbar bg-surface-50">
-                    <div className="max-w-7xl mx-auto">
+                    <main className="max-w-7xl mx-auto px-4 sm:px-8 pb-12 pt-4 sm:pt-6">
                         <Outlet />
-                    </div>
+                    </main>
                 </div>
-            </main>
+            </div>
         </div>
     )
 }

@@ -60,7 +60,7 @@ export const Login: React.FC = () => {
                     </p>
                 </div>
 
-                <div className="bg-white p-10 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100">
+                <div className="bg-white p-6 sm:p-10 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="space-y-2">
                             <label className="text-xs font-bold text-slate-700 uppercase tracking-widest ml-1">Email Address</label>
